@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOIR TRADE</title>
+
+<style>
+body {
+    background: #000;
+    color: #00ffa3;
+    font-family: monospace;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.terminal {
+    background: #111;
+    border: 1px solid #00ffa3;
+    padding: 2rem;
+    width: 300px;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background: #222;
+    color: white;
+    border: 1px solid #333;
+}
+
+button {
+    background: #00ffa3;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#error {
+    color: #ff4d4d;
+    height: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="terminal">
+<h1>NOIR SYSTEM</h1>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button id="loginBtn">LOGIN</button>
+<button id="createBtn">CREATE</button>
+
+<div id="error"></div>
+</div>
+
+<script>
+
+async function apiCall(endpoint, data) {
+
+    try {
+
+        const response = await fetch(`/.netlify/functions/server/${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const json = await response.json();
+
+        if(json.error){
+            document.getElementById("error").textContent = json.error;
+        }
+
+        return json;
+
+    } catch (err) {
+
+        document.getElementById("error").textContent = "Connection failed";
+
+        return { error:true };
+
+    }
+
+}
+
+document.getElementById("loginBtn").onclick = async () => {
+
+    const res = await apiCall("login", {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    });
+
+    if(res.success){
+        alert("Access granted!");
+    }
+
+};
+
+document.getElementById("createBtn").onclick = async () => {
+
+    const res = await apiCall("create", {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    });
+
+    if(res.success){
+        alert("Account created!");
+    }
+
+};
+
+</script>
+
+</body>
+</html>
